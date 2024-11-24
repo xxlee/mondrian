@@ -2,11 +2,6 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.pentaho</groupId>
-    <artifactId>pentaho-ce-jar-parent-pom</artifactId>
-    <version>10.3.0.0-SNAPSHOT</version>
-  </parent>
   <groupId>pentaho</groupId>
   <artifactId>pentaho-mondrian-parent-pom</artifactId>
   <version>10.3.0.0-SNAPSHOT</version>
@@ -14,6 +9,7 @@
   <name>Pentaho Mondrian Parent POM</name>
   <description>Container pom for mondrian and mondrian workbench</description>
   <url>http://www.pentaho.com</url>
+
   <licenses>
     <license>
       <name>Eclipse Public License (EPL), Version 1.0</name>
@@ -26,7 +22,16 @@
     <developerConnection>scm:git:git@github.com:pentaho/mondrian.git</developerConnection>
     <url>scm:git:git@github.com:pentaho/mondrian.git</url>
   </scm>
+
+
   <properties>
+    <java.version>1.8</java.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <source.jdk.version>8</source.jdk.version>
+    <target.jdk.version>8</target.jdk.version>
+    <release.jdk.version>8</release.jdk.version>
+    <maven.compiler.release>8</maven.compiler.release>
     <license.licenseName>epl_only_v1</license.licenseName>
     <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
     <olap4j.version>1.2.0</olap4j.version>
@@ -48,6 +53,15 @@
     <servlet-api.version>2.4</servlet-api.version>
     <commons-lang.version>2.4</commons-lang.version>
     <xmlunit.version>1.1</xmlunit.version>
+    <!-- 移除parent后，有些包要指定版本 -->
+    <xml-apis.version>1.4.01</xml-apis.version>
+    <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
+    <build-helper-maven-plugin.version>3.1.0-pentaho</build-helper-maven-plugin.version>
+    <commons-logging.version>1.2</commons-logging.version>
+    <log4j.version>2.24.1</log4j.version>
+    <commons-vfs2.version>2.8.0</commons-vfs2.version>
+    <dom4j.version>2.1.4</dom4j.version>
+    <xercesImpl.version>2.12.2</xercesImpl.version>
   </properties>
   <profiles>
     <profile>
@@ -57,24 +71,6 @@
       </activation>
       <modules>
         <module>mondrian</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>workbench</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>workbench</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>assemblies</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>assemblies</module>
       </modules>
     </profile>
   </profiles>
