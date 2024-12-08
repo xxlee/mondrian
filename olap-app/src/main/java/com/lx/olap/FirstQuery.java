@@ -1,8 +1,10 @@
 package com.lx.olap;
 
 import mondrian.olap.Axis;
+import mondrian.olap.Cell;
 import mondrian.olap.Connection;
 import mondrian.olap.DriverManager;
+import mondrian.olap.Position;
 import mondrian.olap.Query;
 import mondrian.olap.Result;
 
@@ -27,5 +29,20 @@ public class FirstQuery {
         Result result = connection.execute(query);
         Axis[] axes = result.getAxes();
         connection.close();
+    }
+
+    private static Object[][] getRowData(Result result, int columnCount) {
+        int rowCount = result.getAxes()[0].getPositions().size();
+        Object[][] data = new Object[rowCount][columnCount];
+
+//        for (int row = 0; row < rowCount; row++) {
+//            Position rowPos = result.getAxes()[0].getPositions();
+//            for (int col = 0; col < columnCount; col++) {
+//                Position colPos = result.getAxes()[1].positions[col];
+//                Cell cell = result.getCell(rowPos, colPos);
+//                data[row][col] = cell == null ? null : cell.getValue();
+//            }
+//        }
+        return data;
     }
 }
