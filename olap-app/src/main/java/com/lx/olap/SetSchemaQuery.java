@@ -1,11 +1,23 @@
 package com.lx.olap;
 
+import mondrian.olap.Axis;
+import mondrian.olap.Cell;
 import mondrian.olap.Connection;
 import mondrian.olap.DriverManager;
+import mondrian.olap.Member;
+import mondrian.olap.Position;
 import mondrian.olap.Query;
 import mondrian.olap.Result;
 import mondrian.olap.Util;
+import mondrian.rolap.RolapConnection;
 import mondrian.rolap.RolapConnectionProperties;
+import mondrian.server.Execution;
+import mondrian.server.Statement;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * @Author: lixiang
@@ -13,7 +25,9 @@ import mondrian.rolap.RolapConnectionProperties;
  */
 public class SetSchemaQuery {
 
-    public static void main(String[] args) {
+    private static final Logger logger = LogManager.getLogger(SetSchemaQuery.class);
+
+    public static void main(String[] args) throws SQLException {
 //        Connection connection = DriverManager.getConnection(
 //                "Provider=mondrian;Jdbc=jdbc:mysql://localhost:3306/foodmart?user=foodmart&password=foodmart",
 //                null);
@@ -52,14 +66,41 @@ public class SetSchemaQuery {
                 "</Schema>";
         propertyList.put(RolapConnectionProperties.CatalogContent.name(), catalogContent);
         Connection connection = DriverManager.getConnection(propertyList, null);
+        RolapConnection rolapConnection = (RolapConnection) connection;
+        // descendants 函数来获取 [Time].[1997].[Q1] 的所有后代成员
         String mdx = "SELECT {[Measures].[Unit Sales], [Measures].[Store Sales]} ON COLUMNS,\n" +
                 "  {descendants([Time].[1997].[Q1])} ON ROWS\n" +
                 "FROM [Sales]\n" +
                 "WHERE [Gender].[F]";
         Query query = connection.parseQuery(mdx);
-        Result result = connection.execute(query);
-        connection.close();
-        System.out.println("query result: " + result.toString());
+        Statement statement = query.getStatement();
+        Execution execution = new Execution(statement, 300_000L);
+        Result result = rolapConnection.execute(execution);
+        // 获取所有轴
+        // 0: 列轴
+        // 1: 行 轴
+        Axis[] axes = result.getAxes();
+        Axis columnAxis = axes[0];
+        Axis rowAxis = axes[1];
+        // 获取维度
+        int rowSize = rowAxis.getPositions().size();
+        int columnSize = columnAxis.getPositions().size();
+        Cell[][] cells = new Cell[rowSize][columnSize];
+        for (int i = 0; i < rowSize; i++) {
+            Position position = rowAxis.getPositions().get(i);
+            // 获取到成员名
+            System.out.print(position.get(0).getUniqueName() + " ");
+            // 获取单元格
+            for (int j = 0; j < columnSize; j++) {
+                int[] pos = {j, i};
+                Cell cell = result.getCell(pos);
+                cells[i][j] = cell;
+                System.out.print(cell.getValue() + " ");
+            }
+            System.out.println();
+        }
+        rolapConnection.close();
+        System.out.println("result: " + cells.toString());
     }
 
 }
